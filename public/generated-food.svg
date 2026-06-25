@@ -1,0 +1,44 @@
+<svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generated food image placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="360" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2b211a" />
+      <stop offset="1" stop-color="#0f0b08" />
+    </linearGradient>
+    <radialGradient id="plate" cx="0.5" cy="0.55" r="0.55">
+      <stop stop-color="#3a322c" />
+      <stop offset="1" stop-color="#1a1512" />
+    </radialGradient>
+    <linearGradient id="noodles" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#f5cf6b" />
+      <stop offset="1" stop-color="#e0a83c" />
+    </linearGradient>
+  </defs>
+  <rect width="360" height="360" fill="url(#bg)" />
+  <ellipse cx="180" cy="200" rx="150" ry="120" fill="url(#plate)" />
+  <ellipse cx="180" cy="195" rx="118" ry="92" fill="url(#noodles)" opacity="0.95" />
+  <g stroke="#c8902f" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <path d="M90 180 C140 140 220 150 270 190" fill="none" />
+    <path d="M85 205 C150 175 215 175 275 210" fill="none" />
+    <path d="M95 230 C150 205 215 205 268 235" fill="none" />
+    <path d="M110 255 C160 240 205 240 255 258" fill="none" />
+  </g>
+  <g fill="#3b2a1a">
+    <circle cx="150" cy="180" r="4" />
+    <circle cx="205" cy="200" r="3.5" />
+    <circle cx="175" cy="225" r="4" />
+    <circle cx="230" cy="225" r="3" />
+    <circle cx="125" cy="215" r="3" />
+  </g>
+  <g fill="#d24b3a">
+    <circle cx="160" cy="245" r="7" />
+    <circle cx="215" cy="250" r="6" />
+    <circle cx="195" cy="170" r="5.5" />
+  </g>
+  <g fill="#f6efe0" opacity="0.85">
+    <circle cx="140" cy="160" r="2.5" />
+    <circle cx="220" cy="180" r="2.5" />
+    <circle cx="185" cy="205" r="2.5" />
+    <circle cx="160" cy="200" r="2" />
+    <circle cx="240" cy="205" r="2" />
+  </g>
+</svg>
