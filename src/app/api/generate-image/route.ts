@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { GEMINI_IMAGE_MODEL, getApiKey, withRetry } from "@/lib/gemini";
+import { FLUX_IMAGE_MODEL, withRetry } from "@/lib/huggingface";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-type InlineData = { mimeType?: string; mime_type?: string; data: string };
-type Part = { inlineData?: InlineData; inline_data?: InlineData };
+const HF_IMAGE_URL = "https://router.huggingface.co/nscale/v1/images/generations";
 
 export async function POST(req: Request) {
   try {
@@ -19,38 +18,39 @@ export async function POST(req: Request) {
       );
     }
 
-    const apiKey = getApiKey();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent`;
+    const token = process.env.HF_TOKEN;
+    if (!token) {
+      return NextResponse.json(
+        { error: "HF_TOKEN is not set. Add it to .env." },
+        { status: 500 }
+      );
+    }
 
     const image = await withRetry(async () => {
-      const res = await fetch(url, {
+      const res = await fetch(HF_IMAGE_URL, {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
         },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+          response_format: "b64_json",
+          prompt,
+          model: FLUX_IMAGE_MODEL,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error?.message || `HTTP ${res.status}`);
+        throw new Error(data?.error?.message || data?.error || `HTTP ${res.status}`);
       }
 
-      const parts: Part[] = data?.candidates?.[0]?.content?.parts ?? [];
-      const inline = parts
-        .map((p) => p.inlineData ?? p.inline_data)
-        .find(Boolean);
-
-      if (!inline?.data) {
+      const b64 = data?.data?.[0]?.b64_json;
+      if (!b64) {
         throw new Error("The model did not return an image. Try a different prompt.");
       }
 
-      const mime = inline.mimeType ?? inline.mime_type ?? "image/png";
-      return `data:${mime};base64,${inline.data}`;
+      return `data:image/png;base64,${b64}`;
     });
 
     return NextResponse.json({ image });

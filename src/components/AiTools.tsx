@@ -1,9 +1,9 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ImageAnalysis } from "@/components/tools/image-analysis";
-import { IngredientRecognition } from "@/components/tools/ingredient-recognition";
-import { ImageCreator } from "@/components/tools/image-creator";
+import { ImageAnalysis } from "@/components/tools/ImageAnalysis";
+import { IngredientRecognition } from "@/components/tools/IngredientRecognition";
+import { ImageCreator } from "@/components/tools/ImageCreator";
 
 export function AiTools() {
   return (

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getGeminiModel, withRetry } from "@/lib/gemini";
+import { generateContent } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -25,8 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No message provided." }, { status: 400 });
     }
 
-    const model = getGeminiModel();
-    const result = await withRetry(() => model.generateContent({ contents }));
+    const result = await generateContent({ contents });
 
     return NextResponse.json({ text: result.response.text() });
   } catch (error) {

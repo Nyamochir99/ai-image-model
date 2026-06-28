@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getGeminiModel, withRetry } from "@/lib/gemini";
+import { generateContent } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,14 +20,11 @@ export async function POST(req: Request) {
     }
 
     const base64 = Buffer.from(await file.arrayBuffer()).toString("base64");
-    const model = getGeminiModel();
 
-    const result = await withRetry(() =>
-      model.generateContent([
-        { text: PROMPT },
-        { inlineData: { data: base64, mimeType: file.type || "image/jpeg" } },
-      ])
-    );
+    const result = await generateContent([
+      { text: PROMPT },
+      { inlineData: { data: base64, mimeType: file.type || "image/jpeg" } },
+    ]);
 
     return NextResponse.json({ text: result.response.text() });
   } catch (error) {

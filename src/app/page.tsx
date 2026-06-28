@@ -1,5 +1,5 @@
-import { AiTools } from "@/components/ai-tools";
-import { ChatAssistant } from "@/components/chat-assistant";
+import { AiTools } from "@/components/AiTools";
+import { ChatAssistant } from "@/components/ChatAssistant";
 
 export default function Home() {
   return (

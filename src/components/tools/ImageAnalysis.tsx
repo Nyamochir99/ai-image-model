@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { FileText, RotateCw, Sparkles, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ResultSection, type ResultState } from "./result-section";
+import { ResultSection, type ResultState } from "./ResultSection";
 
 export function ImageAnalysis() {
   const [file, setFile] = useState<File | null>(null);
@@ -87,7 +87,7 @@ export function ImageAnalysis() {
               type="button"
               onClick={clearImage}
               aria-label="Remove image"
-              className="absolute bottom-2 right-2 flex size-6 items-center justify-center rounded-sm border border-border bg-background text-foreground transition-colors hover:bg-accent"
+              className="absolute bottom-2 right-2 flex size-6 cursor-pointer items-center justify-center rounded-sm border border-border bg-background text-foreground transition-colors hover:bg-accent"
             >
               <Trash2 className="size-4" strokeWidth={1.75} />
             </button>

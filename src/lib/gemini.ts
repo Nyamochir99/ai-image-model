@@ -1,31 +1,62 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Stable, high-capacity text/vision model.
-export const GEMINI_MODEL = "gemini-2.0-flash";
-// Image generation model ("nano banana").
-export const GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image";
+/**
+ * Tried in order. If a model is overloaded (503) or rate limited, we fall
+ * back to the next one instead of failing.
+ */
+export const FALLBACK_MODELS = [
+  "gemini-flash-latest",
+  "gemini-2.0-flash",
+  "gemini-flash-lite-latest",
+  "gemini-2.5-flash",
+];
 
-export function getApiKey() {
+export function getGeminiModel(model = FALLBACK_MODELS[0]) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error(
-      "GEMINI_API_KEY is not set. Add it to .env.local (see .env.example)."
-    );
+    throw new Error("GEMINI_API_KEY not configured");
   }
-  return apiKey;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  return genAI.getGenerativeModel({ model });
 }
 
-export function getGeminiModel(model: string = GEMINI_MODEL) {
-  return new GoogleGenerativeAI(getApiKey()).getGenerativeModel({ model });
+type GenerateRequest = Parameters<
+  ReturnType<typeof getGeminiModel>["generateContent"]
+>[0];
+
+function isTransient(message: string) {
+  return /\b(429|503)\b|overloaded|quota|rate.?limit|high demand|unavailable/i.test(
+    message
+  );
 }
 
 /**
- * Retry a Gemini call when the model is temporarily overloaded (503 / 429).
+ * Generate content with automatic retry per model and fallback across models
+ * when Gemini is overloaded or rate limited.
+ */
+export async function generateContent(request: GenerateRequest) {
+  let lastError: unknown;
+  for (const modelName of FALLBACK_MODELS) {
+    try {
+      const model = getGeminiModel(modelName);
+      return await withRetry(() => model.generateContent(request));
+    } catch (error) {
+      lastError = error;
+      if (!isTransient((error as Error).message ?? "")) throw error;
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Retry a Gemini call when the model is temporarily overloaded (503) or
+ * rate limited (429).
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  retries = 2,
-  delayMs = 1200
+  retries = 4,
+  delayMs = 2000
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -33,13 +64,9 @@ export async function withRetry<T>(
       return await fn();
     } catch (error) {
       lastError = error;
-      const message = (error as Error)?.message ?? "";
-      // Only retry transient overloads (503). Do NOT retry 429 quota errors —
-      // the daily quota will not recover within seconds and retrying wastes it.
-      const retryable = /\b(503|overloaded|high demand|unavailable)\b/i.test(
-        message
-      );
-      if (!retryable || attempt === retries) break;
+      const message = (error as Error).message ?? "";
+      const retriable = /\b(429|503)\b|overloaded|rate.?limit/i.test(message);
+      if (!retriable || attempt === retries) break;
       await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
     }
   }

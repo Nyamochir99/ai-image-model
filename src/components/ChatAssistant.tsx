@@ -72,7 +72,7 @@ export function ChatAssistant() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open chat assistant"
-          className="fixed bottom-6 right-6 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+          className="fixed bottom-6 right-6 flex size-12 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
         >
           <MessageCircle className="size-5" strokeWidth={2} />
         </button>

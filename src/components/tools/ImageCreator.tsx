@@ -1,30 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, RotateCw, Sparkles } from "lucide-react";
+import { ImageIcon, RotateCw, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ResultSection, type ResultState } from "./result-section";
+import { ResultSection, type ResultState } from "./ResultSection";
 
-export function IngredientRecognition() {
+export function ImageCreator() {
   const [text, setText] = useState("");
   const [state, setState] = useState<ResultState>("empty");
-  const [result, setResult] = useState("");
+  const [image, setImage] = useState("");
   const [error, setError] = useState("");
 
   async function generate() {
     if (!text.trim()) return;
     setState("loading");
     try {
-      const res = await fetch("/api/ingredients", {
+      const res = await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ prompt: text }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Request failed.");
-      setResult(data.text);
+      setImage(data.image);
       setState("result");
     } catch (e) {
       setError((e as Error).message);
@@ -34,7 +34,7 @@ export function IngredientRecognition() {
 
   function reset() {
     setText("");
-    setResult("");
+    setImage("");
     setError("");
     setState("empty");
   }
@@ -46,7 +46,7 @@ export function IngredientRecognition() {
           <div className="flex items-center gap-2">
             <Sparkles className="size-6 text-foreground" strokeWidth={1.75} />
             <h2 className="text-xl font-semibold text-foreground">
-              Ingredient recognition
+              Food image creator
             </h2>
           </div>
           <Button size="icon" className="size-10" onClick={reset}>
@@ -55,14 +55,14 @@ export function IngredientRecognition() {
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Describe the food, and AI will detect the ingredients.
+          What food image do you want? Describe it briefly.
         </p>
 
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Describe your dish..."
-          className="min-h-[124px] resize-none"
+          placeholder="A delicious plate of spaghetti carbonara..."
+          className="min-h-[130px] resize-none"
         />
 
         <div className="flex justify-end">
@@ -76,14 +76,21 @@ export function IngredientRecognition() {
       </div>
 
       <ResultSection
-        icon={FileText}
-        title="Identified Ingredients"
+        icon={ImageIcon}
+        title="Result"
         state={state}
-        emptyText="First, enter your text to recognize an ingredients."
-        loadingText="Working on your text just wait for moment"
+        emptyText="First, enter your text to generate an image."
         errorMessage={error}
       >
-        <p className="whitespace-pre-line text-sm text-foreground">{result}</p>
+        <p className="text-sm font-medium text-foreground">{text}</p>
+        {image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt={text}
+            className="mt-2 size-[360px] max-w-full rounded-md object-cover"
+          />
+        )}
       </ResultSection>
     </div>
   );

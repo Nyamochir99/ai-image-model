@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getGeminiModel, withRetry } from "@/lib/gemini";
+import { generateContent } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -18,8 +18,7 @@ export async function POST(req: Request) {
 
     const prompt = `You are a culinary assistant. From the following description, identify the food ingredients used and present them as a concise bulleted list. If a specific dish is named, mention it in one short sentence first.\n\nDescription:\n"""${text}"""`;
 
-    const model = getGeminiModel();
-    const result = await withRetry(() => model.generateContent(prompt));
+    const result = await generateContent(prompt);
 
     return NextResponse.json({ text: result.response.text() });
   } catch (error) {
