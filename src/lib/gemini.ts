@@ -4,12 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * Tried in order. If a model is overloaded (503) or rate limited, we fall
  * back to the next one instead of failing.
  */
-export const FALLBACK_MODELS = [
-  "gemini-flash-latest",
-  "gemini-2.0-flash",
-  "gemini-flash-lite-latest",
-  "gemini-2.5-flash",
-];
+export const FALLBACK_MODELS = ["gemini-2.5-flash"];
 
 export function getGeminiModel(model = FALLBACK_MODELS[0]) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -27,7 +22,7 @@ type GenerateRequest = Parameters<
 
 function isTransient(message: string) {
   return /\b(429|503)\b|overloaded|quota|rate.?limit|high demand|unavailable/i.test(
-    message
+    message,
   );
 }
 
@@ -56,7 +51,7 @@ export async function generateContent(request: GenerateRequest) {
 export async function withRetry<T>(
   fn: () => Promise<T>,
   retries = 4,
-  delayMs = 2000
+  delayMs = 2000,
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
