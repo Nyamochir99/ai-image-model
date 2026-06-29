@@ -14,13 +14,25 @@ export function AiTools() {
         <TabsTrigger value="creator">Image creator</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="analysis">
+      <TabsContent
+        value="analysis"
+        forceMount
+        className="data-[state=inactive]:hidden"
+      >
         <ImageAnalysis />
       </TabsContent>
-      <TabsContent value="ingredient">
+      <TabsContent
+        value="ingredient"
+        forceMount
+        className="data-[state=inactive]:hidden"
+      >
         <IngredientRecognition />
       </TabsContent>
-      <TabsContent value="creator">
+      <TabsContent
+        value="creator"
+        forceMount
+        className="data-[state=inactive]:hidden"
+      >
         <ImageCreator />
       </TabsContent>
     </Tabs>
